@@ -11,7 +11,7 @@ The `Database.Mongo.Query` module contains a DSL for building those.
 By defining your schema and using it with the DSL you can ensure that your queries are correct.
 
 Example:
-```
+```purs
 import Database.Mongo.Query (Query)
 import Database.Mongo.Query as Q
 
