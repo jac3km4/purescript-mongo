@@ -11,6 +11,10 @@ module Database.Mongo
   , insertOne
   , find
   , findOne
+  , countDocuments
+  , aggregate
+  , defaultCountOptions
+  , defaultAggregationOptions
   ) where
 import Prelude
 
@@ -18,11 +22,12 @@ import Control.Bind (bindFlipped)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 import Data.Function.Uncurried (Fn1, Fn2, Fn3, Fn5, Fn6, Fn7, Fn8, Fn9, runFn1, runFn2, runFn5, runFn6, runFn7, runFn8, runFn9)
+import Data.Nullable (null)
 import Database.Mongo.ApiCall (ApiCall)
 import Database.Mongo.ApiCall as ApiCall
 import Database.Mongo.Options (InsertOptions, UpdateOptions)
 import Database.Mongo.Query (Query)
-import Database.Mongo.Types (InsertWriteResult)
+import Database.Mongo.Types (CountOptions, InsertWriteResult, AggregationOptions)
 import Effect (Effect)
 import Effect.Aff (Aff, Canceler, error, makeAff, nonCanceler)
 import Effect.Exception (Error)
@@ -72,12 +77,6 @@ findOne q col = makeAff findOne'
       runFn7 _findOne (write q) undefined col noopCancel (cb <<< bindFlipped parse) Left Right
     parse = lmap (error <<< show) <<< read
 
-collect :: ∀ a. ReadForeign a => Cursor -> Aff (Array a)
-collect cur = makeAff \cb ->
-  runFn5 _collect cur noopCancel (cb <<< bindFlipped parse) Left Right
-  where
-    parse = lmap (error <<< show) <<< read
-
 -- | Inserts a single document into MongoDB
 insertOne
   :: ∀ a
@@ -123,6 +122,44 @@ updateMany
   -> Aff InsertWriteResult
 updateMany q u o c = makeAff \cb ->
   runFn9 _update ApiCall.vector (write q) (write u) (write o) c noopCancel cb Left Right
+
+-- | Gets the number of documents matching the filter
+countDocuments :: ∀ a. Query a -> CountOptions -> Collection a -> Aff Int
+countDocuments q o col = makeAff \cb ->
+  runFn7 _countDocuments (write q) o col noopCancel cb Left Right
+
+-- | WIP: implement typesafe aggregation pipelines
+-- | Calculates aggregate values for the data in a collection
+aggregate
+  :: ∀ a
+   . ReadForeign a
+  => Array Foreign
+  -> AggregationOptions
+  -> Collection a
+  -> Aff (Array a)
+aggregate p o col = makeAff aggregate' >>= collect
+  where
+    aggregate' cb = runFn7 _aggregate p o col noopCancel cb Left Right
+
+defaultCountOptions :: CountOptions
+defaultCountOptions =
+  { limit: null, maxTimeMS: null, skip: null, hint: null }
+
+defaultAggregationOptions :: AggregationOptions
+defaultAggregationOptions =
+  { explain: null
+  , allowDiskUse: null
+  , cursor: null
+  , maxTimeMS: null
+  , readConcern: null
+  , hint: null
+  }
+
+collect :: ∀ a. ReadForeign a => Cursor -> Aff (Array a)
+collect cur = makeAff \cb ->
+  runFn5 _collect cur noopCancel (cb <<< bindFlipped parse) Left Right
+  where
+    parse = lmap (error <<< show) <<< read
 
 -- | Do nothing on cancel.
 noopCancel :: forall a. a -> Canceler 
@@ -220,4 +257,24 @@ foreign import _update :: ∀ a.
       (Either Error InsertWriteResult -> Effect Unit)
       (Error -> Either Error Foreign)
       (Foreign -> Either Error Foreign)
+      (Effect Canceler)
+
+foreign import _countDocuments :: ∀ a.
+  Fn7 Foreign
+      (CountOptions)
+      (Collection a)
+      (Collection a -> Canceler)
+      (Either Error Int -> Effect Unit)
+      (Error -> Either Error Int)
+      (Int -> Either Error Int)
+      (Effect Canceler)
+
+foreign import _aggregate :: ∀ a.
+  Fn7 (Array Foreign)
+      (AggregationOptions)
+      (Collection a)
+      (Collection a -> Canceler)
+      (Either Error Cursor -> Effect Unit)
+      (Error -> Either Error Cursor)
+      (Cursor -> Either Error Cursor)
       (Effect Canceler)

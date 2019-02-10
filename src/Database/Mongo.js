@@ -98,3 +98,19 @@ exports._update = function(type, selector, json, options, collection, canceler, 
 
   return canceler(collection);
 };
+
+exports._countDocuments = function(selector, options, collection, canceler, callback, left, right) {
+  collection["countDocuments"](selector, options, function(err, x) {
+    (err ? callback(left(err)) : callback(right(x.result)))();
+  });
+
+  return canceler(collection);
+};
+
+exports._aggregate = function(pipeline, options, collection, canceler, callback, left, right) {
+  collection["aggregate"](pipeline, options, function(err, x) {
+    (err ? callback(left(err)) : callback(right(x.result)))();
+  });
+
+  return canceler(collection);
+};

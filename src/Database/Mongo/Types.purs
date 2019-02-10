@@ -59,3 +59,19 @@ type TextQuery =
   , caseSensitive :: Nullable Boolean
   , diacraticSensitive :: Nullable Boolean
   }
+
+type CountOptions =
+  { limit :: Nullable Int
+  , maxTimeMS :: Nullable Int
+  , skip :: Nullable Int
+  , hint :: Nullable String
+  }
+
+type AggregationOptions =
+  { explain :: Nullable Boolean
+  , allowDiskUse :: Nullable Boolean
+  , cursor :: Nullable { batchSize :: Int }
+  , maxTimeMS :: Nullable Int
+  , readConcern :: Nullable { level :: ReadConcern }
+  , hint :: Nullable String
+  }
