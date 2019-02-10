@@ -12,6 +12,8 @@ By defining your schema and using it with the DSL you can ensure that your queri
 
 Example:
 ```
+import Database.Mongo.Query (Query)
+import Database.Mongo.Query as Q
 
 type Item = { id :: Int, name :: String, inner :: Inner  }
 
