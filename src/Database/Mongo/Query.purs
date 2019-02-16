@@ -16,6 +16,8 @@ module Database.Mongo.Query
   , nin
   , lt
   , lte
+  , gt
+  , gte
   , text
   , elemMatch
   ) where
@@ -62,6 +64,12 @@ lt v = unsafeCoerce $ write { "$lt": v }
 
 lte :: ∀ a. WriteForeign a => a -> Condition a
 lte v = unsafeCoerce $ write { "$lte": v }
+
+gt :: ∀ a. WriteForeign a => a -> Condition a
+gt v = unsafeCoerce $ write { "$gt": v }
+
+gte :: ∀ a. WriteForeign a => a -> Condition a
+gte v = unsafeCoerce $ write { "$gte": v }
 
 text :: TextQuery -> Condition String
 text query = unsafeCoerce $ write { "$text": query }
