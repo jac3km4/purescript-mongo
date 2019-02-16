@@ -6,9 +6,8 @@ import Database.Mongo.Query as Q
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (log)
 import Node.Process (exit)
-import Prelude (Unit, bind, discard, show, ($))
+import Prelude (Unit, bind, ($))
 
 main :: Effect Unit
 main = launchAff_ $ do
@@ -16,7 +15,6 @@ main = launchAff_ $ do
   let db = Mongo.db "db" client
   col <- Mongo.collection "item" db
   item <- Mongo.find searchQuery defaultFindOptions col
-  log $ show item
   liftEffect $ exit 0
 
 type Item = { id :: Int, name :: String, inner :: Inner  }

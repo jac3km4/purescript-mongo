@@ -7,10 +7,8 @@ You can edit this file as you like.
 , dependencies =
     [ "effect"
     , "aff"
-    , "console"
     , "simple-json"
     , "psci-support"
-    , "debug"
     , "node-process"
     ]
 , packages =
