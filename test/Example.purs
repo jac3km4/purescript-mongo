@@ -1,4 +1,5 @@
 module Example where
+import Database.Mongo (defaultFindOptions)
 import Database.Mongo as Mongo
 import Database.Mongo.Query (Query)
 import Database.Mongo.Query as Q
@@ -14,7 +15,7 @@ main = launchAff_ $ do
   client <- Mongo.connect "mongodb://user:pass@host:port/db"
   let db = Mongo.db "db" client
   col <- Mongo.collection "item" db
-  item <- Mongo.find searchQuery col
+  item <- Mongo.find searchQuery defaultFindOptions col
   log $ show item
   liftEffect $ exit 0
 

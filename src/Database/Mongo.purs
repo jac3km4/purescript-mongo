@@ -13,6 +13,7 @@ module Database.Mongo
   , findOne
   , countDocuments
   , aggregate
+  , defaultFindOptions
   , defaultCountOptions
   , defaultAggregationOptions
   ) where
@@ -27,7 +28,7 @@ import Database.Mongo.ApiCall (ApiCall)
 import Database.Mongo.ApiCall as ApiCall
 import Database.Mongo.Options (InsertOptions, UpdateOptions)
 import Database.Mongo.Query (Query)
-import Database.Mongo.Types (CountOptions, InsertWriteResult, AggregationOptions)
+import Database.Mongo.Types (AggregationOptions, CountOptions, InsertWriteResult, FindOptions)
 import Effect (Effect)
 import Effect.Aff (Aff, Canceler, error, makeAff, nonCanceler)
 import Effect.Exception (Error)
@@ -64,10 +65,10 @@ collection name d = makeAff \cb ->
   runFn6 _collection name d noopCancel cb Left Right 
 
 -- | Fetches the an array of documents that match the query
-find :: ∀ a. ReadForeign a => Query a -> Collection a -> Aff (Array a)
-find q col = makeAff find' >>= collect
+find :: ∀ a. ReadForeign a => Query a -> FindOptions -> Collection a -> Aff (Array a)
+find q opts col = makeAff find' >>= collect
   where
-    find' cb = runFn7 _find (write q) undefined col noopCancel cb Left Right
+    find' cb = runFn7 _find (write q) opts col noopCancel cb Left Right
 
 -- | Fetches the first document that matches the query
 findOne :: ∀ a. ReadForeign a => Query a -> Collection a -> Aff a
@@ -140,6 +141,10 @@ aggregate
 aggregate p o col = makeAff aggregate' >>= collect
   where
     aggregate' cb = runFn7 _aggregate p o col noopCancel cb Left Right
+
+defaultFindOptions :: FindOptions
+defaultFindOptions =
+  { limit: null, skip: null, sort: null }
 
 defaultCountOptions :: CountOptions
 defaultCountOptions =
@@ -228,7 +233,7 @@ foreign import _findOne :: ∀ a.
 
 foreign import _find :: ∀ a.
   Fn7 Foreign
-      Foreign
+      FindOptions
       (Collection a)
       (Collection a -> Canceler)
       (Either Error Cursor -> Effect Unit)

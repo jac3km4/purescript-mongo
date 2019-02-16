@@ -21,6 +21,7 @@ module Database.Mongo.Query
   ) where
 import Prelude
 
+import Data.Maybe (Maybe)
 import Database.Mongo.Types (TextQuery)
 import Foreign (Foreign)
 import Record as Record
@@ -114,7 +115,8 @@ instance nilWriteQueryFields ::
 
 class UnNest a b
 
-instance unnestCondition :: UnNest (Condition a) a
+instance unnestConditionMaybe :: UnNest (Condition (Maybe a)) a
+else instance unnestCondition :: UnNest (Condition a) a
 
 instance recordUnNest ::
   ( RowToList row rl

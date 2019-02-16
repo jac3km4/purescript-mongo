@@ -3,6 +3,7 @@ module Database.Mongo.Types where
 import Data.Nullable (Nullable)
 import Database.Mongo.ReadConcern (ReadConcern)
 import Database.Mongo.ReadPreference (ReadPreference)
+import Database.Mongo.Sort (Sort)
 import Database.Mongo.WriteConcern (WriteConcern)
 
 type MongoError =
@@ -58,6 +59,12 @@ type TextQuery =
   , language :: Nullable String
   , caseSensitive :: Nullable Boolean
   , diacraticSensitive :: Nullable Boolean
+  }
+
+type FindOptions =
+  { limit :: Nullable Int
+  , skip :: Nullable Int
+  , sort :: Nullable (Array Sort)
   }
 
 type CountOptions =
