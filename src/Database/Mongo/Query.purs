@@ -74,7 +74,7 @@ gte v = unsafeCoerce $ write { "$gte": v }
 text :: TextQuery -> Condition String
 text query = unsafeCoerce $ write { "$text": query }
 
-elemMatch :: ∀ a. Query a -> Condition a
+elemMatch :: ∀ a. Query a -> Condition (Array a)
 elemMatch q = unsafeCoerce $ write { "$elemMatch": q }
 
 instance writeForeignCondition :: WriteForeign (Condition a) where
@@ -123,8 +123,7 @@ instance nilWriteQueryFields ::
 
 class UnNest a b
 
-instance unnestConditionMaybe :: UnNest (Condition (Maybe a)) a
-else instance unnestCondition :: UnNest (Condition a) a
+instance unnestCondition :: UnNest (Condition a) a
 
 instance recordUnNest ::
   ( RowToList row rl
