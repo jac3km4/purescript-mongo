@@ -7,6 +7,7 @@ module Database.Mongo.Query
   , Query
   , class UnNest
   , class UnNestFields
+  , empty
   , and
   , or
   , not
@@ -23,7 +24,6 @@ module Database.Mongo.Query
   ) where
 import Prelude
 
-import Data.Maybe (Maybe)
 import Database.Mongo.Types (TextQuery)
 import Foreign (Foreign)
 import Record as Record
@@ -37,6 +37,9 @@ import Unsafe.Coerce (unsafeCoerce)
 
 foreign import data Query :: Type -> Type
 foreign import data Condition :: Type -> Type
+
+empty :: ∀ a. Query a
+empty = unsafeCoerce {}
 
 and :: ∀ a. Array (Query a) -> Query a
 and qs = unsafeCoerce $ write { "$and": write qs }
