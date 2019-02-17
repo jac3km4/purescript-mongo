@@ -109,7 +109,7 @@ exports._countDocuments = function(selector, options, collection, canceler, call
 
 exports._aggregate = function(pipeline, options, collection, canceler, callback, left, right) {
   collection["aggregate"](pipeline, options, function(err, x) {
-    (err ? callback(left(err)) : callback(right(x.result)))();
+    (err ? callback(left(err)) : callback(right(x)))();
   });
 
   return canceler(collection);
