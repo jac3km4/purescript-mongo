@@ -2,7 +2,7 @@
 Typesafe Mongo library for Purescript
 
 # usage
-File `test/Example.purs` has an example demonstrating how to conenct to a DB.
+File `test/Example.purs` has an example demonstrating how to connect to a DB.
 
 # queries
 
